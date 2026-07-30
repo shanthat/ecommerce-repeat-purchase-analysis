@@ -1,0 +1,97 @@
+table orders
+	lineageTag: e0f58f9f-0bfe-4a6a-9173-c97073d1285a
+
+	column order_id
+		dataType: string
+		lineageTag: 397598bb-0bcc-44b5-8bc8-aca9752a7fa0
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: string
+		lineageTag: b880ed8c-d010-42a6-b06a-91a115cdb67c
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 32f4adc0-69f5-440f-8e5e-5de910c240c3
+		summarizeBy: none
+		sourceColumn: order_date
+
+		variation Variation
+			isDefault
+			relationship: 6648fd4f-acf1-4a9e-8ef5-fd18f80a8d9f
+			defaultHierarchy: LocalDateTable_7f17c3a4-e730-4ea8-ac94-4ccd79a5f531.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column currency_raw
+		dataType: string
+		lineageTag: 358436c9-5f00-483b-9089-c84e1a8b861b
+		summarizeBy: none
+		sourceColumn: currency_raw
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_status
+		dataType: string
+		lineageTag: 1a02ec45-2705-4108-94be-b2348528734d
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Currency
+		dataType: string
+		lineageTag: 6eb171a2-0210-4ad4-8bf9-52cbb5789d12
+		summarizeBy: none
+		sourceColumn: Currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column short_date
+		dataType: string
+		lineageTag: f0496784-7a59-44be-9276-ba9949972d34
+		summarizeBy: none
+		sourceColumn: short_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 71f50e0e-cb59-4d20-b8dd-087dc542f4c5
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition orders = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\Shan\Downloads\Claude\ecommerce-repeat-purchase-analysis\orders.csv"),[Delimiter=",", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", type text}, {"customer_id", type text}, {"order_date", type datetime}, {"currency_raw", type text}, {"order_status", type text}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type", "Currency", each [currency_raw]),
+				    #"Replaced Value" = Table.ReplaceValue(#"Added Custom","$","USD",Replacer.ReplaceText,{"Currency"}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value","USUSD","USD",Replacer.ReplaceText,{"Currency"}),
+				    #"Replaced Value2" = Table.ReplaceValue(#"Replaced Value1","usd","USD",Replacer.ReplaceText,{"Currency"}),
+				    #"Replaced Value3" = Table.ReplaceValue(#"Replaced Value2","USD ","USD",Replacer.ReplaceText,{"Currency"}),
+				    #"Added Custom1" = Table.AddColumn(#"Replaced Value3", "short_date", each [order_date]),
+				    #"Inserted Date" = Table.AddColumn(#"Added Custom1", "Date", each DateTime.Date([short_date]), type date)
+				in
+				    #"Inserted Date"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

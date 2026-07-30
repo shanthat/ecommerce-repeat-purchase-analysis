@@ -1,0 +1,11 @@
+expression Date =
+		let
+		    Source = List.Dates
+		in
+		    Source
+	lineageTag: 93c35c95-62ff-4a56-a069-986c67c75337
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+

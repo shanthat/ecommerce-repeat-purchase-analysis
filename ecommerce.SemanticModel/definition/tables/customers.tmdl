@@ -1,0 +1,81 @@
+table customers
+	lineageTag: 52f16ab4-023d-481f-9504-b6b8b704fc55
+
+	column customer_id
+		dataType: string
+		lineageTag: 90659589-1ff6-46c6-a6b3-7e891c5d2bc8
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_name
+		dataType: string
+		lineageTag: 661431d9-4b64-423c-bff1-ab7ccfbf2e3e
+		summarizeBy: none
+		sourceColumn: customer_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column email
+		dataType: string
+		lineageTag: 3e468040-4da8-467a-bd69-b4cb7381a7ff
+		summarizeBy: none
+		sourceColumn: email
+
+		annotation SummarizationSetBy = Automatic
+
+	column phone
+		dataType: string
+		lineageTag: 7072207a-f055-40bb-9d4a-9624aea56e39
+		summarizeBy: none
+		sourceColumn: phone
+
+		annotation SummarizationSetBy = Automatic
+
+	column signup_date_raw
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d347caee-a78e-4512-8f4a-d01592ac3ab0
+		summarizeBy: none
+		sourceColumn: signup_date_raw
+
+		variation Variation
+			isDefault
+			relationship: d0c5cebd-a5b2-44df-9c38-9fe4bda494a5
+			defaultHierarchy: LocalDateTable_51cd3c4c-7532-4b29-afe3-8f530cf23e9c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column tier
+		dataType: string
+		lineageTag: 4af70c5f-e83e-4144-abbf-92ea03ce5289
+		summarizeBy: none
+		sourceColumn: tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column region
+		dataType: string
+		lineageTag: 97514611-3ef8-4610-b2be-be362c848a6f
+		summarizeBy: none
+		sourceColumn: region
+
+		annotation SummarizationSetBy = Automatic
+
+	partition customers = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\Shan\Downloads\Claude\ecommerce-repeat-purchase-analysis\customers.csv"),[Delimiter=",", Columns=7, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"customer_id", type text}, {"customer_name", type text}, {"email", type text}, {"phone", type text}, {"signup_date_raw", type date}, {"tier", type text}, {"region", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,53 @@
+table 'Date table'
+	lineageTag: f1ed8acc-32f2-4566-8b26-c93f28a847b7
+
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 550bb599-9355-49b9-93ce-c37292d8b7ac
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variation
+			isDefault
+			relationship: db87a6de-3ce8-4bc4-83a5-7e1e9f73b560
+			defaultHierarchy: LocalDateTable_e518ce4c-3ae3-46b6-943b-453382109d74.'Date Hierarchy'
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Month
+		dataType: string
+		lineageTag: b4714046-59fc-4300-ac80-9afe88c81c8f
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: string
+		lineageTag: 6df78f4d-1c26-4f74-ace6-18b40b4378e1
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Date table' = m
+		mode: import
+		source =
+				let
+				    Source = Date(#date(2025, 7, 1), 365, #duration(1, 0, 0, 0)),
+				    #"Converted to Table" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+				    #"Renamed Columns" = Table.RenameColumns(#"Converted to Table",{{"Column1", "Date"}}),
+				    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Month", each Date.MonthName([Date])),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Year", each Date.Year([Date]))
+				in
+				    #"Added Custom1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

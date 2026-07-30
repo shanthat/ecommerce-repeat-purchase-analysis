@@ -1,0 +1,62 @@
+table products
+	lineageTag: 4064eb85-2c9d-48e5-b9c5-4d91087aeb1f
+
+	column product_id
+		dataType: string
+		lineageTag: 894f6f82-b276-4b5c-960e-d103d90430cc
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		lineageTag: 0739a5ba-5e58-4688-9f8f-f2b9d0b82896
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 901e47d8-8aa5-4cb1-88e2-0fce5bb764b3
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_cost
+		dataType: double
+		lineageTag: 48a17e45-0e81-48d7-9847-80e3f0ec8181
+		summarizeBy: none
+		sourceColumn: unit_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column unit_price
+		dataType: double
+		lineageTag: e9bc46af-fbc3-43ec-8084-e89d3d78ad3d
+		summarizeBy: none
+		sourceColumn: unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition products = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\Shan\Downloads\Claude\ecommerce-repeat-purchase-analysis\products.csv"),[Delimiter=",", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"product_id", type text}, {"product_name", type text}, {"category", type text}, {"unit_cost", type number}, {"unit_price", type number}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Changed Type","","Uncategorized",Replacer.ReplaceValue,{"category"})
+				in
+				    #"Replaced Value"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
